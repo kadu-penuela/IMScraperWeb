@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMScraper</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --primary-gradient: linear-gradient(135deg, #2196F3, #1976D2);
+            --success-color: #4CAF50;
+            --success-gradient: linear-gradient(135deg, #4CAF50, #388E3C);
+            --danger-color: #f44336;
+            --danger-gradient: linear-gradient(135deg, #f44336, #d32f2f);
+            --beta-color: #FF6B6B;
+            --beta-gradient: linear-gradient(135deg, #FF6B6B, #FF4F4F);
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --bg-light: #FFFFFF;
+            --bg-light-gradient: linear-gradient(135deg, #FFFFFF, #F5F5F5);
+            --bg-dark: #262626;
+            --bg-dark-gradient: linear-gradient(135deg, #2C2C2C, #1E1E1E);
+            --spacing-unit: 6px;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            --box-shadow-hover: 0 4px 15px rgba(0, 0, 0, 0.12);
+            --transition-speed: 0.25s;
+        }
+
+        body {
+            background-color: #F5F5F5;
+            background-image: linear-gradient(to bottom, #FFFFFF, #F5F5F5),
+                             radial-gradient(circle at top right, rgba(33, 150, 243, 0.08), transparent 70%),
+                             radial-gradient(circle at bottom left, rgba(76, 175, 80, 0.08), transparent 70%),
+                             radial-gradient(circle at center, rgba(33, 150, 243, 0.05), transparent 40%),
+                             radial-gradient(circle at 75% 65%, rgba(63, 81, 181, 0.07), transparent 40%),
+                             radial-gradient(circle at 25% 30%, rgba(3, 169, 244, 0.06), transparent 45%);
+            background-blend-mode: normal;
+            color: var(--text-primary);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.5;
+            margin: 0;
+            padding: var(--spacing-unit);
+            scroll-behavior: smooth;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 15px;
+            letter-spacing: 0.01em;
+            min-height: 100vh;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            background-image: var(--bg-dark-gradient),
+                            radial-gradient(circle at top right, rgba(33, 150, 243, 0.15), transparent 70%),
+                            radial-gradient(circle at bottom left, rgba(156, 39, 176, 0.15), transparent 70%),
+                            radial-gradient(circle at center, rgba(33, 150, 243, 0.1), transparent 40%),
+                            radial-gradient(circle at 75% 65%, rgba(63, 81, 181, 0.12), transparent 40%),
+                            radial-gradient(circle at 25% 30%, rgba(3, 169, 244, 0.1), transparent 45%);
+            background-blend-mode: normal;
+            color: #ffffff;
+        }
+
+        body.dark-mode h1 {
+            color: rgba(230, 235, 240, 0.9) !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode label,
+        body.dark-mode .section-title {
+            color: #eee;
+        }
+
+        .btn {
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 14px;
+            padding: calc(var(--spacing-unit) * 1.3) calc(var(--spacing-unit) * 2);
+            transition: all var(--transition-speed) ease;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            color: #333;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+            opacity: 0.7;
+        }
+
+        .btn:hover {
+            box-shadow: var(--box-shadow-hover);
+            filter: brightness(1.05);
+        }
+
+        .submit-btn {
+            background: linear-gradient(to bottom right, rgba(66, 165, 245, 0.9), rgba(25, 118, 210, 0.9));
+            color: white;
+        }
+
+        .reset-btn {
+            background: linear-gradient(to bottom right, rgba(239, 83, 80, 0.8), rgba(183, 28, 28, 0.8));
+            color: white;
+        }
+
+        body.dark-mode .btn {
+            background-color: #3a3a3a;
+            color: #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-mode .btn::after {
+            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            filter: grayscale(30%);
+        }
+
+        .form-input {
+            width: calc(100% - var(--spacing-unit) * 4);
+            padding: calc(var(--spacing-unit) * 1.5);
+            margin-bottom: calc(var(--spacing-unit) * 1);
+            border: 1px solid rgba(224, 224, 224, 0.8);
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 14px;
+            transition: all var(--transition-speed) ease;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            color: var(--text-primary);
+            letter-spacing: 0.01em;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        .form-input:disabled {
+            background-color: rgba(245, 245, 245, 0.7);
+            cursor: not-allowed;
+        }
+
+        body.dark-mode .form-input {
+            background-color: rgba(51, 51, 51, 0.7);
+            border-color: rgba(68, 68, 68, 0.7);
+            color: #ffffff;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .form-input:focus {
+            background-color: rgba(55, 55, 55, 0.85);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.25), inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .form-input:disabled {
+            background-color: rgba(34, 34, 34, 0.7);
+        }
+
+        .api-section {
+            width: 100%;
+            margin-bottom: calc(var(--spacing-unit) * 2.5);
+            padding: 0;
+            border-radius: var(--border-radius);
+        }
+
+        body.dark-mode .api-section {
+            background: transparent;
+            border: none;
+        }
+
+        /* Switch Toggle Styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            min-width: 48px;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: background-color 0.4s;
+            border-radius: 34px;
+            box-sizing: border-box;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: transform 0.4s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+        }
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        input:disabled + .slider {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Loading Spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            margin: calc(var(--spacing-unit) * 2) auto;
+            border: 3px solid rgba(33, 150, 243, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary-color);
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        /* Progress Bar */
+        .progress {
+            height: 8px;
+            background-color: rgba(33, 150, 243, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: calc(var(--spacing-unit) * 2) 0;
+            display: none;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease-in-out;
+        }
+
+        /* Status Indicator */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: calc(var(--spacing-unit));
+            transition: background-color 0.3s ease;
+        }
+        .status-active {
+            background-color: var(--success-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        .status-inactive {
+            background-color: var(--danger-color);
+            box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
+        }
+        /* Main Layout & Components */
+        .main-container {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: calc(var(--spacing-unit) * 2);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 1.2);
+            letter-spacing: 0.01em;
+        }
+
+        .api-toggle-container {
+            background: linear-gradient(to bottom, rgba(55, 55, 55, 0.9), rgba(47, 49, 54, 0.9));
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(70, 70, 70, 0.8);
+            padding: calc(var(--spacing-unit) * 2.5);
+            margin: 0 0 calc(var(--spacing-unit) * 3) 0;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .api-toggle-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(33, 150, 243, 0.07), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        body.dark-mode .api-toggle-container {
+            background: linear-gradient(to bottom, rgba(51, 51, 51, 0.85), rgba(45, 45, 45, 0.85));
+            border-color: rgba(68, 68, 68, 0.7);
+        }
+
+        .url-counter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 8px;
+            height: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.85);
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 4px;
+            position: absolute;
+            right: calc(var(--spacing-unit) * 2);
+            top: calc(var(--spacing-unit) * 2);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+
+        body.dark-mode .url-counter {
+            background: rgba(33, 150, 243, 0.15);
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(33, 150, 243, 0.2);
+        }
+
+        .url-counter::before {
+            content: "🔗";
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .notification {
+            padding: calc(var(--spacing-unit) * 2);
+            border-radius: var(--border-radius);
+            margin: calc(var(--spacing-unit) * 2) 0;
+            position: relative;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            line-height: 1.5;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .notification-success {
+            background: linear-gradient(to right, rgba(232, 245, 233, 0.9), rgba(241, 248, 233, 0.9));
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .notification-error {
+            background: linear-gradient(to right, rgba(255, 235, 238, 0.9), rgba(252, 228, 236, 0.9));
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+        }
+
+        .notification-info {
+            background: linear-gradient(to right, rgba(227, 242, 253, 0.9), rgba(225, 245, 254, 0.9));
+            border: 1px solid #bbdefb;
+            color: #0d47a1;
+        }
+
+        .notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 30%;
+            height: 100%;
+            background: linear-gradient(to left, rgba(255, 255, 255, 0.4), transparent);
+            transform: skewX(-15deg);
+            pointer-events: none;
+        }
+
+        /* Job status container */
+        .job-status-container {
+            padding: calc(var(--spacing-unit) * 3);
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.95), rgba(50, 50, 50, 0.95));
+            border: 1px solid rgba(70, 70, 70, 0.8);
+            margin-top: calc(var(--spacing-unit) * 3);
+            display: none;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .job-status-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(33, 150, 243, 0.05), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(156, 39, 176, 0.05), transparent 40%);
+            pointer-events: none;
+            animation: shift-background 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes shift-background {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        body.dark-mode .job-status-container {
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.95), rgba(40, 40, 40, 0.95));
+        }
+
+        .job-status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .job-id-display {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: monospace;
+            background-color: rgba(60, 60, 60, 0.5);
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(80, 80, 80, 0.5);
+            overflow: auto;
+            max-width: 100%;
+            text-overflow: ellipsis;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode .job-id-display {
+            background-color: rgba(68, 68, 68, 0.7);
+            border-color: rgba(85, 85, 85, 0.7);
+            color: #ddd;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .job-status-actions {
+            display: flex;
+            gap: calc(var(--spacing-unit));
+            margin-top: calc(var(--spacing-unit) * 2);
+        }
+
+        .job-progress-info {
+            font-size: 13px;
+            margin-bottom: calc(var(--spacing-unit));
+        }
+
+        .estimated-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: calc(var(--spacing-unit));
+        }
+
+        @media (max-width: 600px) {
+            .btn {
+                width: 100%;
+                margin-bottom: var(--spacing-unit);
+            }
+
+            .form-container {
+                padding: calc(var(--spacing-unit));
+            }
+
+            .job-status-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: calc(var(--spacing-unit));
+            }
+
+            .job-status-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+        }
+
+        /* Card styling with improved aesthetics */
+        #url-form {
+            position: relative;
+            background: linear-gradient(135deg, rgba(50, 50, 50, 0.9), rgba(45, 45, 45, 0.9));
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow), 0 0 0 1px rgba(63, 81, 181, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        #url-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), #5C6BC0);
+            z-index: 5;
+        }
+
+        #url-form::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 0% 0%, rgba(66, 165, 245, 0.05), transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(156, 39, 176, 0.05), transparent 40%),
+                radial-gradient(circle at 100% 0%, rgba(3, 169, 244, 0.03), transparent 30%),
+                radial-gradient(circle at 0% 100%, rgba(76, 175, 80, 0.03), transparent 30%);
+            pointer-events: none;
+            z-index: -1;
+            animation: subtle-shift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes subtle-shift {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        body.dark-mode #url-form {
+            background: linear-gradient(135deg, rgba(50, 50, 50, 0.9), rgba(40, 40, 40, 0.9));
+            box-shadow: var(--box-shadow), 0 0 0 1px rgba(63, 81, 181, 0.15);
+        }
+
+        /* Animation for the top bar when job is processing */
+        @keyframes progress-gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .processing-animation::before {
+            background: linear-gradient(90deg, var(--primary-color), #5C6BC0, #3F51B5, var(--primary-color));
+            background-size: 300% 100%;
+            animation: progress-gradient 3s ease infinite;
+        }
+
+        /* Additional UI Improvements */
+        /* API Key validation indicator */
+        .api-key-status {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .api-key-status.visible {
+            opacity: 1;
+        }
+
+        .api-key-loading {
+            width: 14px;
+            height: 14px;
+            margin-right: 4px;
+            border: 2px solid rgba(33, 150, 243, 0.1);
+            border-radius: 50%;
+            border-top: 2px solid var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        .api-key-valid {
+            color: var(--success-color);
+        }
+
+        .api-key-invalid {
+            color: var(--danger-color);
+        }
+
+        /* Success animation */
+        @keyframes success-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+
+        .success-animation {
+            animation: success-pulse 1.5s ease-out;
+        }
+
+        /* URL parsing feedback */
+        .url-parse-feedback {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: none;
+            align-items: center;
+            transition: opacity 0.3s ease;
+            margin-bottom: 4px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .url-parse-valid {
+            color: var(--success-color);
+            background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+            padding: 10px 14px;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--success-color);
+        }
+
+        .url-parse-invalid {
+            color: var(--danger-color);
+            background: linear-gradient(to right, rgba(244, 67, 54, 0.1), rgba(244, 67, 54, 0.05));
+            padding: 10px 14px;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--danger-color);
+        }
+
+        /* URL input specific style to match API section */
+        .url-textarea {
+            width: 100% !important;
+            font-family: monospace;
+            resize: vertical;
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        /* FIX: Improved styling for validation buttons */
+        .url-parse-feedback button {
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 10px;
+            margin-left: 8px;
+            transition: all var(--transition-speed) ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .url-parse-feedback button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+            opacity: 0.7;
+        }
+
+        .url-parse-feedback button:hover {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            filter: brightness(1.1);
+        }
+
+        .url-parse-feedback button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        #show-invalid-urls {
+            background: linear-gradient(to bottom right, rgba(33, 150, 243, 0.4), rgba(25, 118, 210, 0.4));
+        }
+
+        #remove-invalid-urls {
+            background: linear-gradient(to bottom right, rgba(244, 67, 54, 0.4), rgba(211, 47, 47, 0.4));
+        }
+
+        /* Remove old mini-btn styles that might conflict */
+        .mini-btn, .remove-invalid-btn {
+            /* Reset any existing styles */
+            background: none;
+            border: none;
+        }
+
+        body.dark-mode .url-parse-feedback button {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        body.dark-mode .mini-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Invalid URLs dropdown */
+        .invalid-urls-dropdown {
+            display: none;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+            margin-top: 16px;
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 13px;
+            z-index: 10;
+            position: relative;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        body.dark-mode .invalid-urls-dropdown {
+            background: rgba(51, 51, 51, 0.9);
+            border-color: #444;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .invalid-urls-dropdown h4 {
+            margin: 0;
+            padding: 12px 16px;
+            background: linear-gradient(to right, rgba(245, 245, 245, 0.9), rgba(240, 240, 240, 0.9));
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        body.dark-mode .invalid-urls-dropdown h4 {
+            background: linear-gradient(to right, rgba(68, 68, 68, 0.9), rgba(60, 60, 60, 0.9));
+            border-bottom: 1px solid #555;
+        }
+
+        .invalid-urls-dropdown ul {
+            margin: 0;
+            padding: 12px 16px;
+            list-style-type: none;
+        }
+
+        .invalid-urls-dropdown li {
+            padding: 6px 0;
+            color: var(--danger-color);
+            word-break: break-all;
+            line-height: 1.5;
+            letter-spacing: 0.01em;
+        }
+
+        /* API preference toggle enhancements */
+        .remember-api-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: calc(var(--spacing-unit) * 3);
+            padding: calc(var(--spacing-unit) * 1.5);
+            font-size: 14px;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .remember-api-toggle input {
+            margin-right: calc(var(--spacing-unit) * 1.5);
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+        }
+
+        body.dark-mode .remember-api-toggle {
+            color: #bbb;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Desktop layout optimization */
+        @media (min-width: 992px) {
+            .main-container {
+                max-width: 900px;
+            }
+        }
+
+        /* Status indicator pulse animation */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .status-active {
+            animation: pulse 2s infinite;
+        }
+
+        /* Improved button states */
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+        }
+
+        /* New vertical layout classes */
+        .url-input-section {
+            position: relative;
+            padding-bottom: calc(var(--spacing-unit) * 3);
+        }
+
+        .api-toggle-section {
+            margin-bottom: calc(var(--spacing-unit) * 3);
+        }
+
+        .api-keys-section {
+            margin-bottom: calc(var(--spacing-unit) * 3);
+        }
+
+        .action-buttons-section {
+            display: flex;
+            gap: calc(var(--spacing-unit) * 2);
+            margin-top: calc(var(--spacing-unit) * 2);
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="main-container">
+        <header style="text-align: center; margin-bottom: calc(var(--spacing-unit) * 4); padding: calc(var(--spacing-unit) * 2) 0;">
+            <div style="display: inline-flex; align-items: center; gap: calc(var(--spacing-unit) * 2);">
+                <h1 style="font-size: 2.4rem; margin: 0; font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); font-family: 'SF Pro Display', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">IMScraper Web</h1>
+            </div>
+        </header>
+
+        <form id="url-form" method="POST" style="background-color: var(--bg-light); padding: calc(var(--spacing-unit) * 2.5); border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); border: 1px solid rgba(0, 0, 0, 0.1);">
+            <!-- 1. URL Input Section -->
+            <div class="url-input-section">
+                <label class="section-title" style="display: flex; align-items: center; margin-bottom: calc(var(--spacing-unit) * 2);">
+                    Add websites:
+                </label>
+                <!-- FIX: Updated textarea with proper width -->
+                <textarea
+                    name="urls[]"
+                    id="urls"
+                    rows="4"
+                    placeholder="Paste websites for scraping, one URL per line."
+                    required
+                    class="form-input url-textarea"
+                    style="font-family: monospace; resize: vertical; width: 100%; margin: 0; box-sizing: border-box;"
+                ></textarea>
+                <div id="url-parse-feedback" class="url-parse-feedback"></div>
+                <div id="invalid-urls-dropdown" class="invalid-urls-dropdown">
+                    <h4>Invalid URLs</h4>
+                    <ul id="invalid-urls-list"></ul>
+                </div>
+            </div>
+
+            <!-- 2. API Toggle Section -->
+            <div class="api-toggle-section">
+                <div class="api-toggle-container">
+                    <div class="section-title" style="margin-bottom: calc(var(--spacing-unit) * 2);">Select services to use:</div>
+                    <div style="display: flex; flex-direction: column; gap: calc(var(--spacing-unit) * 2);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
+                                <span class="status-dot status-active" id="majestic-status-dot"></span>
+                                <span style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <strong>Majestic</strong>
+                                </span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="use_majestic" id="use-majestic" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
+                                <span class="status-dot status-active" id="ahrefs-status-dot"></span>
+                                <span style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <strong>Ahrefs</strong>
+                                </span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="use_ahrefs" id="use-ahrefs" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
+                                <span class="status-dot status-active" id="dataforseo-status-dot"></span>
+                                <span style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <strong>DataForSEO</strong>
+                                </span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="use_dataforseo" id="use-dataforseo" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="remember-api-toggle">
+                        <input type="checkbox" id="remember-api-selection" checked>
+                        <label for="remember-api-selection">Always remember selected IMScraper services</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. API Keys Section -->
+            <div class="api-keys-section">
+                <div id="majestic-section" class="api-section">
+                    <label class="section-title" style="display: block; margin-bottom: calc(var(--spacing-unit) * 2.5);">Majestic API Key:</label>
+                    <div style="position: relative;">
+                        <input
+                            type="text"
+                            id="majestic-api-key"
+                            name="majestic_api_key"
+                            placeholder="Enter your Majestic API Key"
+                            required
+                            class="form-input"
+                            autocomplete="on"
+                        >
+                        <div id="majestic-api-status" class="api-key-status">
+                            <div class="api-key-loading"></div>
+                            <span>Validating...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ahrefs-section" class="api-section">
+                    <label class="section-title" style="display: block; margin-bottom: calc(var(--spacing-unit) * 2.5);">Ahrefs API Key:</label>
+                    <div style="position: relative;">
+                        <input
+                            type="text"
+                            id="ahrefs-api-key"
+                            name="ahrefs_api_key"
+                            placeholder="Enter your Ahrefs API Key"
+                            required
+                            class="form-input"
+                            autocomplete="on"
+                        >
+                        <div id="ahrefs-api-status" class="api-key-status">
+                            <div class="api-key-loading"></div>
+                            <span>Validating...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dataforseo-section" class="api-section">
+                    <label class="section-title" style="display: block; margin-bottom: calc(var(--spacing-unit) * 2.5);">DataForSEO Account and Key:</label>
+                    <div style="position: relative;">
+                        <input
+                            type="text"
+                            id="dataforseo-api-key"
+                            name="dataforseo_api_key"
+                            placeholder="Account:API Key"
+                            required
+                            class="form-input"
+                            autocomplete="on"
+                        >
+                        <div id="dataforseo-api-status" class="api-key-status">
+                            <div class="api-key-loading"></div>
+                            <span>Validating...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Action Buttons Section -->
+            <div class="action-buttons-section">
+                <button type="submit" id="submit-btn" class="btn submit-btn" style="flex: 1; max-width: calc(50% - var(--spacing-unit));">
+                    <span>Start Scraping</span>
+                </button>
+                <button type="button" id="reset-btn" onclick="resetUrlList()" class="btn reset-btn" style="flex: 1; max-width: calc(50% - var(--spacing-unit));">
+                    <span>Clear List</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="loading-spinner" id="loading-spinner"></div>
+
+        <div id="feedback" class="notification notification-success" style="display: none;">
+            <span id="feedback-message">Done!</span>
+            <button onclick="this.parentElement.style.display='none'" style="position: absolute; top: 5px; right: 8px; background: none; border: none; font-size: 18px; cursor: pointer; opacity: 0.7;">&times;</button>
+        </div>
+
+        <div id="error" class="notification notification-error" style="display: none;">
+            <span id="error-message"></span>
+            <button onclick="this.parentElement.style.display='none'" style="position: absolute; top: 5px; right: 8px; background: none; border: none; font-size: 18px; cursor: pointer; opacity: 0.7;">&times;</button>
+        </div>
+
+        <!-- Job Status UI -->
+        <div id="job-status-container" class="job-status-container">
+            <div class="job-status-header">
+                <h3 style="margin: 0; font-size: 16px;">Job Status</h3>
+                <span class="job-id-display" id="job-id-display">job_12345</span>
+            </div>
+
+            <div id="job-status-info" class="notification notification-info">
+                <span id="job-status-message">Your job is being processed...</span>
+            </div>
+
+            <div class="job-progress-info">
+                <span id="job-progress-text">Processing URLs: 0 of 0</span>
+            </div>
+
+            <div class="progress" style="display: block;">
+                <div class="progress-bar" id="job-progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="estimated-time" id="estimated-time">
+                Estimated time remaining: calculating...
+            </div>
+
+            <div class="job-status-actions">
+                <button id="download-btn" class="btn submit-btn" style="flex: 1; display: none;">
+                    <span>📥 Download Results</span>
+                </button>
+                <button id="cancel-btn" class="btn reset-btn" style="flex: 1;">
+                    <span>❌ Cancel Job</span>
+                </button>
+                <button id="new-job-btn" class="btn submit-btn" style="flex: 1; display: none;">
+                    <span>🆕 Start New Job</span>
+                </button>
+            </div>
+        </div>
+
+        <footer style="margin-top: calc(var(--spacing-unit) * 4); opacity: 0.8; font-size: 11px; text-align: center;">
+            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: calc(var(--spacing-unit) * 2);">
+                <button onclick="window.location.href='mailto:kadu.penuela@kape.com?subject=IMScraper bug report';" class="btn" style="font-size: 11px; padding: 4px 8px;">
+                    <span>🐞 Report a Bug</span>
+                </button>
+                <!-- Light mode button temporarily removed -->
+            </div>
+            <p style="margin: 4px 0;">Made in 🇧🇷 by Kadu Penuela Sanches Estevam</p>
+            <p style="margin: 4px 0;">WebUI version 2.2 | IMScraper Worker version 4.3</p>
+        </footer>
+    </div>
+    <script>
+        // Global variables
+        let currentJobId = null;
+        let totalUrls = 0;
+        let statusCheckInterval = null;
+        let jobStartTime = null;
+        // Invalid URLs tracking
+        let invalidUrls = [];
+
+        // Initialize API toggles and status indicators on page load
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Load API selections from localStorage
+            if (localStorage.getItem('remember_api_selection') !== 'false') {
+                document.getElementById('remember-api-selection').checked = true;
+                const useMajestic = localStorage.getItem('use_majestic') !== 'false';
+                const useAhrefs = localStorage.getItem('use_ahrefs') !== 'false';
+                const useDataForSeo = localStorage.getItem('use_dataforseo') !== 'false';
+
+                document.getElementById('use-majestic').checked = useMajestic;
+                document.getElementById('use-ahrefs').checked = useAhrefs;
+                document.getElementById('use-dataforseo').checked = useDataForSeo;
+
+                updateApiStatus('majestic', useMajestic);
+                updateApiStatus('ahrefs', useAhrefs);
+                updateApiStatus('dataforseo', useDataForSeo);
+
+                // Update visibility of API sections
+                const majesticSection = document.getElementById('majestic-section');
+                const ahrefsSection = document.getElementById('ahrefs-section');
+                const dataforseoSection = document.getElementById('dataforseo-section');
+
+                majesticSection.style.opacity = useMajestic ? '1' : '0.5';
+                document.getElementById('majestic-api-key').disabled = !useMajestic;
+
+                ahrefsSection.style.opacity = useAhrefs ? '1' : '0.5';
+                document.getElementById('ahrefs-api-key').disabled = !useAhrefs;
+
+                dataforseoSection.style.opacity = useDataForSeo ? '1' : '0.5';
+                document.getElementById('dataforseo-api-key').disabled = !useDataForSeo;
+            } else {
+                document.getElementById('use-majestic').checked = true;
+                document.getElementById('use-ahrefs').checked = true;
+                document.getElementById('use-dataforseo').checked = true;
+                updateApiStatus('majestic', true);
+                updateApiStatus('ahrefs', true);
+                updateApiStatus('dataforseo', true);
+            }
+
+            // Attempt to restore job from localStorage if page is refreshed during active job
+            restoreJobFromStorage();
+
+            // Set up URL parsing feedback
+            setupUrlParseFeedback();
+        });
+
+        // FIX: Updated setupUrlParseFeedback function with improved button styling
+        function setupUrlParseFeedback() {
+            const urlsTextarea = document.getElementById('urls');
+            const feedbackDiv = document.getElementById('url-parse-feedback');
+
+            urlsTextarea.addEventListener('input', function() {
+                invalidUrls = []; // Reset invalid URLs list
+                const urls = urlsTextarea.value.trim();
+                if (!urls) {
+                    feedbackDiv.style.display = 'none';
+                    document.getElementById('invalid-urls-dropdown').style.display = 'none';
+                    return;
+                }
+
+                const urlList = urls.split('\n').filter(url => url.trim());
+                const validUrls = urlList.filter(url => isValidUrl(url.trim()));
+
+                // Collect invalid URLs
+                invalidUrls = urlList.filter(url => url.trim() && !isValidUrl(url.trim()));
+
+                if (urlList.length > 0) {
+                    feedbackDiv.style.display = 'flex';
+
+                    if (invalidUrls.length === 0) {
+                        feedbackDiv.className = 'url-parse-feedback url-parse-valid';
+                        feedbackDiv.innerHTML = `✓ All ${urlList.length} URLs look valid`;
+                        document.getElementById('invalid-urls-dropdown').style.display = 'none';
+                    } else {
+                        feedbackDiv.className = 'url-parse-feedback url-parse-invalid';
+                        feedbackDiv.innerHTML = `⚠️ Found <strong>${invalidUrls.length}</strong> invalid URLs <button id="show-invalid-urls">Show</button><button id="remove-invalid-urls">Remove All</button>`;
+
+                        // Add event listeners directly
+                        document.getElementById('show-invalid-urls').addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const dropdown = document.getElementById('invalid-urls-dropdown');
+                            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+                        });
+
+                        document.getElementById('remove-invalid-urls').addEventListener('click', function(e) {
+                            e.preventDefault();
+                            removeInvalidUrls();
+                        });
+
+                        // Populate dropdown with invalid URLs immediately
+                        const list = document.getElementById('invalid-urls-list');
+                        list.innerHTML = '';
+
+                        // Find line numbers for invalid URLs
+                        const allLines = urlsTextarea.value.split('\n');
+                        invalidUrls.forEach(url => {
+                            const lineNumber = allLines.findIndex(line => line.trim() === url) + 1;
+                            const item = document.createElement('li');
+                            item.innerHTML = `<strong>Line ${lineNumber}:</strong> ${url}`;
+                            list.appendChild(item);
+                        });
+                    }
+                } else {
+                    feedbackDiv.style.display = 'none';
+                    document.getElementById('invalid-urls-dropdown').style.display = 'none';
+                }
+            });
+        }
+
+        // Function to remove all invalid URLs - FIXED VERSION
+        function removeInvalidUrls() {
+            if (invalidUrls.length === 0) return;
+
+            const textarea = document.getElementById('urls');
+            const lines = textarea.value.split('\n');
+            const validLines = lines.filter(line => {
+                const trimmedLine = line.trim();
+                return trimmedLine === '' || isValidUrl(trimmedLine);
+            });
+
+            // Store the count of removed URLs before updating
+            const removedCount = lines.length - validLines.length;
+
+            // Update textarea with valid URLs
+            textarea.value = validLines.join('\n');
+
+            // Trigger the input event to ensure validation display updates
+            const inputEvent = new Event('input', { bubbles: true });
+            textarea.dispatchEvent(inputEvent);
+
+            // Show a success message
+            const successDiv = document.getElementById('feedback');
+            const successMsg = document.getElementById('feedback-message');
+            successMsg.textContent = `Removed ${removedCount} invalid URL${removedCount !== 1 ? 's' : ''}`;
+            successDiv.style.display = 'block';
+
+            // Auto-hide the success message after 3 seconds
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Basic URL validation
+        function isValidUrl(url) {
+            try {
+                // If no protocol, add http:// temporarily for validation
+                if (!/^https?:\/\//i.test(url)) {
+                    url = 'http://' + url;
+                }
+
+                const pattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/i;
+                return pattern.test(url);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+
+            // Update the dark mode button text
+            const darkModeBtn = document.querySelector('button[onclick="toggleDarkMode()"] span');
+            if (isDarkMode) {
+                darkModeBtn.innerHTML = "☀️ Light Mode";
+            } else {
+                darkModeBtn.innerHTML = "🌙 Dark Mode";
+            }
+        }
+
+        // Always force dark mode
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'true');
+
+        // FIXED VERSION of resetUrlList
+        function resetUrlList() {
+            document.getElementById('urls').value = '';
+            updateUrlCount();
+
+            // Trigger the input event to ensure validation display updates
+            const urlsTextarea = document.getElementById('urls');
+            const inputEvent = new Event('input', { bubbles: true });
+            urlsTextarea.dispatchEvent(inputEvent);
+
+            invalidUrls = [];
+        }
+
+        function updateUrlCount() {
+            const urls = document.getElementById('urls').value
+                .split('\n')
+                .filter(url => url.trim() !== '').length;
+            document.getElementById('url-count').textContent = urls;
+        }
+
+        function updateApiStatus(apiType, isEnabled) {
+            const statusDot = document.getElementById(`${apiType}-status-dot`);
+            statusDot.className = `status-dot ${isEnabled ? 'status-active' : 'status-inactive'}`;
+        }
+
+        document.getElementById('urls').addEventListener('input', updateUrlCount);
+
+        // Handle remember API selection preference
+        document.getElementById('remember-api-selection').addEventListener('change', function() {
+            localStorage.setItem('remember_api_selection', this.checked);
+            if (!this.checked) {
+                // If unchecked, remove saved preferences
+                localStorage.removeItem('use_majestic');
+                localStorage.removeItem('use_ahrefs');
+                localStorage.removeItem('use_dataforseo');
+            }
+        });
+
+        ['use-majestic', 'use-ahrefs', 'use-dataforseo'].forEach(id => {
+            document.getElementById(id).addEventListener('change', function() {
+                const input = document.getElementById(id.replace('use-', '') + '-api-key');
+                const section = document.getElementById(id.replace('use-', '') + '-section');
+                input.required = this.checked;
+                section.style.opacity = this.checked ? '1' : '0.5';
+                input.disabled = !this.checked;
+                if (!this.checked) input.value = '';
+                updateApiStatus(id.replace('use-', ''), this.checked);
+
+                // Save API selection preference if enabled
+                if (document.getElementById('remember-api-selection').checked) {
+                    localStorage.setItem(id.replace('-', '_'), this.checked);
+                }
+            });
+        });
+
+        // Save API keys to localStorage
+        function saveApiKeys() {
+            if (document.getElementById('use-majestic').checked) {
+                localStorage.setItem('majestic_api_key', document.getElementById('majestic-api-key').value);
+            }
+            if (document.getElementById('use-ahrefs').checked) {
+                localStorage.setItem('ahrefs_api_key', document.getElementById('ahrefs-api-key').value);
+            }
+            if (document.getElementById('use-dataforseo').checked) {
+                localStorage.setItem('dataforseo_api_key', document.getElementById('dataforseo-api-key').value);
+            }
+        }
+
+        // Load API keys from localStorage
+        function loadApiKeys() {
+            const majesticKey = localStorage.getItem('majestic_api_key');
+            const ahrefsKey = localStorage.getItem('ahrefs_api_key');
+            const dataForSeoKey = localStorage.getItem('dataforseo_api_key');
+
+            if (majesticKey) document.getElementById('majestic-api-key').value = majesticKey;
+            if (ahrefsKey) document.getElementById('ahrefs-api-key').value = ahrefsKey;
+            if (dataForSeoKey) document.getElementById('dataforseo-api-key').value = dataForSeoKey;
+        }
+
+        // Load API keys on page load
+        loadApiKeys();
+
+        // API key validation with specific format checks
+        function simulateApiKeyValidation(apiType) {
+            const input = document.getElementById(`${apiType}-api-key`);
+            const statusElement = document.getElementById(`${apiType}-api-status`);
+
+            input.addEventListener('input', debounce(function() {
+                const value = input.value.trim();
+                if (!value) {
+                    statusElement.classList.remove('visible');
+                    return;
+                }
+
+                // Show loading indicator
+                statusElement.classList.add('visible');
+                statusElement.innerHTML = '<div class="api-key-loading"></div><span>Validating...</span>';
+
+                // Validate with proper format check after a delay
+                setTimeout(() => {
+                    let isValid = false;
+                    let message = '✗ Invalid key format';
+
+                    // Check format based on API type
+                    if (apiType === 'majestic') {
+                        // Majestic: 32 characters, uppercase letters and numbers
+                        const majesticRegex = /^[A-Z0-9]{32}$/;
+                        isValid = majesticRegex.test(value);
+                        message = isValid ? '✓ Valid' : '✗ Invalid';
+                    }
+                    else if (apiType === 'ahrefs') {
+                        // Ahrefs: 40 characters, mixed case letters and numbers
+                        const ahrefsRegex = /^[a-zA-Z0-9]{40}$/;
+                        isValid = ahrefsRegex.test(value);
+                        message = isValid ? '✓ Valid' : '✗ Invalid';
+                    }
+                    else if (apiType === 'dataforseo') {
+                        // DataForSEO: email:API key format
+                        const dataforseoRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}:[a-z0-9]{16,}$/;
+                        isValid = dataforseoRegex.test(value);
+                        message = isValid ? '✓ Valid' : '✗ Invalid';
+                    }
+
+                    if (isValid) {
+                        statusElement.className = 'api-key-status visible api-key-valid';
+                        statusElement.innerHTML = message;
+                    } else {
+                        statusElement.className = 'api-key-status visible api-key-invalid';
+                        statusElement.innerHTML = message;
+                    }
+
+                    // Keep validation message visible (no auto-hide)
+
+                }, 800);
+            }, 500));
+        }
+
+        // Set up API key validation for each API
+        simulateApiKeyValidation('majestic');
+        simulateApiKeyValidation('ahrefs');
+        simulateApiKeyValidation('dataforseo');
+
+        // Debounce function for input handlers
+        function debounce(func, wait) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+
+        // Format time remaining
+        function formatTimeRemaining(seconds) {
+            if (seconds < 60) {
+                return `${Math.round(seconds)} seconds`;
+            } else if (seconds < 3600) {
+                return `${Math.floor(seconds / 60)} minutes ${Math.round(seconds % 60)} seconds`;
+            } else {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                return `${hours} hours ${minutes} minutes`;
+            }
+        }
+
+        // Calculate estimated time remaining
+        function calculateTimeRemaining(processed, total, elapsedTime) {
+            if (processed === 0) return 'calculating...';
+
+            const avgTimePerUrl = elapsedTime / processed;
+            const remaining = total - processed;
+            const estimatedSeconds = avgTimePerUrl * remaining;
+
+            return formatTimeRemaining(estimatedSeconds);
+        }
+
+        // Save job to localStorage
+        function saveJobToStorage(jobId) {
+            localStorage.setItem('current_job_id', jobId);
+            localStorage.setItem('job_start_time', Date.now().toString());
+            localStorage.setItem('total_urls', totalUrls.toString());
+        }
+
+        // Clear job from localStorage
+        function clearJobFromStorage() {
+            localStorage.removeItem('current_job_id');
+            localStorage.removeItem('job_start_time');
+            localStorage.removeItem('total_urls');
+        }
+
+        // Restore job from localStorage (if exists)
+        function restoreJobFromStorage() {
+            const savedJobId = localStorage.getItem('current_job_id');
+            const savedStartTime = localStorage.getItem('job_start_time');
+            const savedTotalUrls = localStorage.getItem('total_urls');
+
+            if (savedJobId && savedStartTime && savedTotalUrls) {
+                currentJobId = savedJobId;
+                jobStartTime = parseInt(savedStartTime);
+                totalUrls = parseInt(savedTotalUrls);
+
+                // Disable form and show job status
+                showJobStatus();
+                startStatusCheck();
+            }
+        }
+
+        // Show job status UI and hide form
+        function showJobStatus() {
+            // Update job ID display
+            document.getElementById('job-id-display').textContent = currentJobId;
+
+            // Hide the form and show job status in its place
+            document.getElementById('url-form').style.display = 'none';
+            document.getElementById('job-status-container').style.display = 'block';
+            document.getElementById('loading-spinner').style.display = 'none';
+        }
+
+        // Hide job status UI and re-enable form
+        function hideJobStatus() {
+            // Clear job ID and reset UI
+            currentJobId = null;
+            clearJobFromStorage();
+
+            // Stop status checks
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+                statusCheckInterval = null;
+            }
+
+            // Show form and hide job status
+            document.getElementById('url-form').style.display = 'block';
+            document.getElementById('job-status-container').style.display = 'none';
+
+            // Reset form elements to be interactive
+            const formElements = document.querySelectorAll('#url-form input, #url-form textarea, #url-form button, #url-form .switch input');
+            formElements.forEach(el => {
+                if (!el.id.includes('-api-key') || document.getElementById(`use-${el.id.split('-')[0]}`).checked) {
+                    el.disabled = false;
+                }
+            });
+
+            // Reset button states
+            document.getElementById('download-btn').style.display = 'none';
+            document.getElementById('cancel-btn').style.display = 'block';
+            document.getElementById('new-job-btn').style.display = 'none';
+
+            // Reset progress indicators
+            document.getElementById('job-progress-bar').style.width = '0%';
+            document.getElementById('job-progress-text').textContent = 'Processing URLs: 0 of 0';
+            document.getElementById('estimated-time').textContent = 'Estimated time remaining: calculating...';
+            document.getElementById('job-status-info').className = 'notification notification-info';
+            document.getElementById('job-status-message').textContent = 'Your job is being processed...';
+        }
+
+        // Start periodic check of job status
+        function startStatusCheck() {
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+            }
+
+            // Check immediately
+            checkJobStatus();
+
+            // Then check every 5 seconds
+            statusCheckInterval = setInterval(checkJobStatus, 5000);
+        }
+
+        // Check job status
+        async function checkJobStatus() {
+            if (!currentJobId) return;
+
+            try {
+                const response = await fetch(`/job_status/${currentJobId}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    console.error('Error checking job status:', data.message);
+                    return;
+                }
+
+                // Handle simple "not found" - job may not have been picked up yet
+                if (data.status === 'not_found') {
+                    document.getElementById('job-status-info').className = 'notification notification-info';
+                    document.getElementById('job-status-message').textContent = 'Job is queued and waiting to be processed...';
+                    return;
+                }
+
+                updateJobStatusUI(data);
+            } catch (error) {
+                console.error('Error checking job status:', error);
+            }
+        }
+
+        // Update job status UI based on status data
+        function updateJobStatusUI(statusData) {
+            const status = statusData.status;
+            const statusInfo = document.getElementById('job-status-info');
+            const statusMessage = document.getElementById('job-status-message');
+
+            // Update progress if applicable
+            if (statusData.progress !== undefined && statusData.total !== undefined) {
+                const progress = statusData.progress;
+                const total = statusData.total;
+                const percent = total > 0 ? Math.round((progress / total) * 100) : 0;
+
+                document.getElementById('job-progress-bar').style.width = `${percent}%`;
+                document.getElementById('job-progress-text').textContent = `Processing URLs: ${progress} of ${total}`;
+
+                // Update estimated time remaining
+                if (jobStartTime) {
+                    const elapsedMs = Date.now() - jobStartTime;
+                    const elapsedSeconds = elapsedMs / 1000;
+                    const timeRemaining = calculateTimeRemaining(progress, total, elapsedSeconds);
+                    document.getElementById('estimated-time').textContent = `Estimated time remaining: ${timeRemaining}`;
+                }
+            }
+
+            // Update status message and UI based on job status
+            switch(status) {
+                case 'queued':
+                    statusInfo.className = 'notification notification-info';
+                    statusMessage.textContent = 'Your job is queued and waiting to be processed.';
+                    break;
+
+                case 'processing':
+                    statusInfo.className = 'notification notification-info';
+                    statusMessage.textContent = 'Your job is being processed. This may take several minutes for large URL lists.';
+                    break;
+
+                case 'completed':
+                    statusInfo.className = 'notification notification-success success-animation';
+                    statusMessage.textContent = 'Your job has been completed successfully! You can now download the results.';
+                    document.getElementById('download-btn').style.display = 'block';
+                    document.getElementById('cancel-btn').style.display = 'none';
+                    document.getElementById('new-job-btn').style.display = 'block';
+
+                    // Stop status checks
+                    if (statusCheckInterval) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+
+                    if (statusData.download_url) {
+                        document.getElementById('download-btn').onclick = () => {
+                            window.location.href = statusData.download_url;
+                        };
+                    }
+                    break;
+
+                case 'error':
+                    statusInfo.className = 'notification notification-error';
+                    statusMessage.textContent = `An error occurred: ${statusData.error || 'Unknown error'}`;
+                    document.getElementById('new-job-btn').style.display = 'block';
+                    document.getElementById('cancel-btn').style.display = 'none';
+
+                    // Stop status checks
+                    if (statusCheckInterval) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+                    break;
+
+                case 'cancelled':
+                    statusInfo.className = 'notification notification-info';
+                    statusMessage.textContent = 'This job has been cancelled.';
+                    document.getElementById('new-job-btn').style.display = 'block';
+                    document.getElementById('cancel-btn').style.display = 'none';
+
+                    // Stop status checks
+                    if (statusCheckInterval) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+                    break;
+
+                case 'not_found':
+                    statusInfo.className = 'notification notification-error';
+                    statusMessage.textContent = 'Job not found. It may have been deleted or expired.';
+                    document.getElementById('new-job-btn').style.display = 'block';
+                    document.getElementById('cancel-btn').style.display = 'none';
+
+                    // Stop status checks
+                    if (statusCheckInterval) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+                    break;
+
+                default:
+                    statusInfo.className = 'notification notification-info';
+                    statusMessage.textContent = `Job status: ${status}`;
+            }
+        }
+
+        // Cancel current job
+        async function cancelJob() {
+            if (!currentJobId) return;
+
+            try {
+                const response = await fetch(`/cancel_job/${currentJobId}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('job-status-info').className = 'notification notification-info';
+                    document.getElementById('job-status-message').textContent = 'Job cancellation requested. This may take a moment...';
+                    document.getElementById('cancel-btn').disabled = true;
+                } else {
+                    console.error('Error cancelling job:', data.error);
+                    document.getElementById('job-status-info').className = 'notification notification-error';
+                    document.getElementById('job-status-message').textContent = `Error cancelling job: ${data.error}`;
+                }
+            } catch (error) {
+                console.error('Error cancelling job:', error);
+            }
+        }
+
+        // Event listener for form submission
+        document.getElementById('url-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+
+            // Set API toggle values
+            formData.set('use_majestic', document.getElementById('use-majestic').checked.toString());
+            formData.set('use_ahrefs', document.getElementById('use-ahrefs').checked.toString());
+            formData.set('use_dataforseo', document.getElementById('use-dataforseo').checked.toString());
+
+            // Validate at least one API is selected
+            if (!document.getElementById('use-majestic').checked &&
+                !document.getElementById('use-ahrefs').checked &&
+                !document.getElementById('use-dataforseo').checked) {
+                document.getElementById('error-message').textContent = "Please select at least one API to use.";
+                document.getElementById('error').style.display = 'block';
+                return;
+            }
+
+            // Parse URLs
+            formData.delete('urls[]');
+            const urlList = document.getElementById('urls').value.split('\n')
+                .map(url => url.trim())
+                .filter(url => url);
+
+            if (urlList.length === 0) {
+                document.getElementById('error-message').textContent = "Please enter at least one URL.";
+                document.getElementById('error').style.display = 'block';
+                return;
+            }
+
+            urlList.forEach(url => formData.append('urls[]', url));
+
+            // Save API keys for future use
+            saveApiKeys();
+
+            // Show loading spinner
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('reset-btn').disabled = true;
+            document.getElementById('loading-spinner').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('feedback').style.display = 'none';
+
+            try {
+                // Submit job
+                const response = await fetch('/submit_job', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Store job details
+                    currentJobId = result.job_id;
+                    totalUrls = result.total_urls;
+                    jobStartTime = Date.now();
+
+                    // Save to localStorage
+                    saveJobToStorage(currentJobId);
+
+                    // Show job status UI
+                    showJobStatus();
+
+                    // Start checking status
+                    startStatusCheck();
+
+                    document.getElementById('loading-spinner').style.display = 'none';
+                } else {
+                    // Show error
+                    document.getElementById('error-message').textContent = result.error || "An unknown error occurred.";
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('loading-spinner').style.display = 'none';
+                    document.getElementById('submit-btn').disabled = false;
+                    document.getElementById('reset-btn').disabled = false;
+                }
+            } catch (err) {
+                document.getElementById('error-message').textContent = "Failed to submit job. Please check your connection.";
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('submit-btn').disabled = false;
+                document.getElementById('reset-btn').disabled = false;
+            }
+        });
+
+        // Event listener for the cancel button
+        document.getElementById('cancel-btn').addEventListener('click', cancelJob);
+
+        // Event listener for the new job button
+        document.getElementById('new-job-btn').addEventListener('click', hideJobStatus);
+    </script>
+</body>
+</html>
