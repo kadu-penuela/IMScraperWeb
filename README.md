@@ -21,47 +21,6 @@ It provides a simple web interface designed for easy hosting and low resource us
 
 ---
 
-## 🛠️ Installation
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/imscraper-web.git
-cd imscraper-web
-```
-
-### 2. Install Python Dependencies
-
-Use the provided `requirements.txt`:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## Running the Application Locally
-
-In two separate terminals:
-
-### Terminal 1 (Run the Flask Web App)
-
-```bash
-python app.py
-```
-
-> The web interface will be available at [http://localhost:5000](http://localhost:5000)
-
-### Terminal 2 (Run the Background Worker)
-
-```bash
-python background_worker.py
-```
-
-> This monitors new jobs and handles asynchronous scraping and report generation.
-
----
-
 ## Project Structure
 
 ```
