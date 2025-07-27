@@ -29,8 +29,6 @@ imscraper-web/
 ├── app.py                # Flask web interface
 ├── background_worker.py  # Asynchronous job processor
 ├── requirements.txt      # Python dependencies
-├── LICENSE               # Project license (MIT, for example)
-├── README.md             # This file
 │
 ├── templates/
 │   └── index.html        # Web UI for submitting jobs
